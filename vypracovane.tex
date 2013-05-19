@@ -1,0 +1,502 @@
+\documentclass[a4paper]{report}
+\usepackage{pdfpages}
+\usepackage[utf8]{inputenc}
+\usepackage[slovak]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{environ}
+\usepackage{ifmtarg}
+\usepackage{listings}
+\usepackage{lmodern}
+\usepackage{rotating}
+\usepackage{setspace}
+\usepackage{etoolbox}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[framemethod=default]{mdframed}
+\usepackage{fullpage}
+\usepackage{verbatim}
+\usepackage{hyperref}
+
+\definecolor{lightyellow}{rgb}{1.0,1.0,0.7}
+
+\newcommand{\todoin}[1]{\fcolorbox{red}{red}{\color{yellow}\textbf{TODO: }}\fcolorbox{red}{lightyellow}{#1}}
+\newcommand{\todo}[1]{\todoin{#1}\linebreak}
+\newcommand{\bigtodo}[1]{\begin{mdframed}[frametitle={\color{yellow}\textbf{TODO:}},
+ frametitlebackgroundcolor=red,
+ backgroundcolor=lightyellow,
+ skipbelow=2mm,
+ linecolor=red,
+ innertopmargin=.8\baselineskip] #1 \end{mdframed}}
+
+\newcommand{\zadanieref}[1]{\refstepcounter{section}
+\addcontentsline{toc}{section}{\protect\numberline{\thesection} #1}}
+
+\newcommand{\zadanietpl}[2]{
+\begin{mdframed}
+\vspace{0.7em}
+{\large \textbf \thesection} \quad {\large \textbf {#1}}
+\nopagebreak
+#2
+\nopagebreak
+\vspace{0.7em}
+\end{mdframed}
+\vspace{1 em}
+}
+
+\NewEnviron{zadanie}[1][]{%
+\medbreak
+\zadanieref{#1}
+\nopagebreak
+\zadanietpl{#1}{\vspace{1.25 em} \BODY}
+}
+
+\newcommand{\kzadanie}[1]{
+\medbreak
+\zadanieref{#1}
+\nopagebreak
+\zadanietpl{#1}{}
+}
+
+\begin{document}
+\begingroup % predok
+\pagenumbering{roman}
+\tableofcontents
+\endgroup % predok
+
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\chapter{Databázy}
+
+\begin{zadanie}[Účel databáz, charakteristika DB aplikácií, trojstupňová ANSI/SPARC architektúra, koncepčné dátové modely, navrhovanie databáz]
+
+\begin{itemize}
+ \item Entitno-relačný a relačný dátový model.
+ \item Entitno-relačné diagramy, UML diagramy.
+ \item Motivácia normalizácie.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Teória navrhovania databáz]
+
+\begin{itemize}
+ \item Funkčné závislosti, Armstrongove axiómy.
+ \item Uzáver množiny atribútov, uzáver množiny funkčných závislostí.
+ \item Pokrytie a minimálne pokrytie množiny funkčných závislostí.
+ \item Nadkľúče a kľúče.
+ \item Relačné schémy, dekompozícia relačných schém, bezstratovosť dekompozície.
+ \item Normálne formy: 3NF, BCNF.
+ \item Naivná dekompozícia do 3NF a BCNF.
+ \item Dekompozícia do 3NF zachovávajúca funkčné závislosti.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Dotazovacie jazyky]
+\begin{itemize}
+ \item Relácie a predikáty, dotazy, relačný kalkul, Datalog, SQL, relačná algebra.
+ \item Vyjadrovacia sila a vzájomné simulácie dotazovacích jazykov.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Agregácia a rekurzia v dotazovacích jazykoch]
+\begin{itemize}
+ \item Grupovanie a agregácia v relačnej algebre, SQL, relačnom kalkule a Datalogu.
+ \item Rekurzia v relačnej algebre, SQL, relačnom kalkule a Datalogu.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Výpočet rekurzívnych programov a programov s negáciou]
+\begin{itemize}
+ \item Naivná evaluácia, seminaivná evaluácia.
+ \item Unifikácia, SLD rezolúcia, rule-goal-tree, rule-goal-graph, väzby medzi premennými (binding patterns).
+ \item Magická transformácia.
+ \item Modely, stratifikovaná negácia, stable a well-founded sémantika.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Optimalizácia dotazov]
+\begin{itemize}
+ \item Strom relačného výrazu.
+ \item Optimalizácia konjunktívnych dotazov dekompozíciou hypergrafu, Wong-Youssefiho algoritmus.
+ \item Optimalizácia pomocou semijoinov, úplný reduktor, Yannakakisov algoritmus.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Optimalizácia konjunktívnych dotazov]
+\begin{itemize}
+ \item Pohltenie (containment) a ekvivalencia konjunktívnych dotazov.
+ \item Testovanie pohltenia, petrifikované dotazy.
+ \item Optimalizácia za predpokladu slabej ekvivalencie.
+ \item Tablá a ich použitie.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Transakcie]
+\begin{itemize}
+ \item Definícia transakcie, elementárne transakčné operácie, požiadavky na transakčný systém.
+ \item Komponenty transakčného databázového systému.
+ \item Rozvrhy, triedy rozvrhov.
+ \item Konflikt-sériovateľnosť, testovanie konflikt-seriovatelnosti, view-sériovateľnosť, dvojfázové zamykanie, obnova.
+ \item Striktné dvojfázové zamykanie, riešenie deadlockov.
+ \item Časové pečiatky, validácia.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Fyzická organizácia]
+\begin{itemize}
+ \item Fyzická algebra, zložitosť fyzických operátorov.
+ \item Sekvenčné indexy, B stromy a B+ stromy.
+ \item Hashovanie.
+ \item Štruktúra hashovaného súboru: adresár, základné bloky, bloky preplnenia.
+ \item Rozšíriteľné hashovanie.
+ \item Lineárne hashovanie.
+ \item Implementácia a zložitosť vybraných fyzických operátorov (merge-sort, nested-loop-join, ...).
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Distribuované databázy]
+\begin{itemize}
+ \item Atomický commit, výber koordinátora (bully algoritmus), replikácia dát.
+ \item Distribuované zámky, distribuované deadlocky.
+ \item Synchronizácia času, Christianov algoritmus, Berkeley algoritmus.
+\end{itemize}
+\end{zadanie}
+
+\chapter{Distribuované systémy}
+
+\begin{zadanie}[Vrstvové modely]
+\begin{itemize}
+ \item vrstvy, služby, rozhrania (interfaces), referenčný model OSI
+ \item TCP/IP, úlohy jednotlivých vrstiev
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Sieťová vrstva v TCP/IP]
+\begin{itemize}
+ \item adresácia v TCP/IP, protokoly IP, ARP, ICMP
+ \item routovanie (smerovanie) v TCP/IP, NAT
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Transportná vrstva v TCP/IP]
+\begin{itemize}
+ \item úlohy a služby transportnej vrstvy
+ \item protokoly UDP a TCP
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Fyzická a linková vrstva]
+\begin{itemize}
+ \item Ethernet, CSMA/CD
+ \item rozširovanie Ethernetu na fyzickej a linkovej vrstve – huby, switche, WiFi, CSMA/CA
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Domain Name System (DNS)]
+\begin{itemize}
+ \item doménové meno, úloha DNS, architektúra DNS
+ \item typy záznamov, reverzné vyhľadávanie
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Bezpečnostné mechanizmy na linkovej vrstve]
+\begin{itemize}
+ \item VLAN
+ \item riadenie prístupu k portu na báze linkovej adresy
+ \item IEEE 802.1X, bezpečnosť WiFi
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Bezpečnostné mechanizmy na sieťovej a transportnej vrstve]
+\begin{itemize}
+ \item firewall
+ \item IPSec
+ \item SSL/TLS
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Bezpečnosť elektronickej pošty a webu]
+\begin{itemize}
+ \item problémy a riešenia, end-to-end security
+ \item PGP, S/MIME
+ \item komunikácia so serverom (IMAPS, POP3S, SMTPS)
+ \item HTTPS, certifikáty
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Model komunikácie so zdieľanou pamäťou]
+\begin{itemize}
+ \item POSIX thready, vytváranie, ukončovanie a finálna synchronizácia threadov.
+ \item Zdieľané premenné, mutex, conditional variable.
+ \item Scheduling.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Thready v Jave]
+\begin{itemize}
+ \item Vytváranie threadov, ukončovanie threadov.
+ \item Synchronizácia prístupu k metódam a premenným.
+ \item Synchronizácia na úrovni tried a na úrovni objektov.
+ \item Scheduling.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Kanálový model komunikácie]
+\begin{itemize}
+ \item Synchrónna a asynchrónna kanálová komunikácia.
+ \item sémantika posielania a prijímania správ.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Point-to-point model komunikácie]
+\begin{itemize}
+ \item Synchrónna a asynchrónna point-to-point komunikácia.
+ \item Sémantika posielania a prijímania správ.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Problém Commitu v distribuovaných databázach]
+\begin{itemize}
+ \item Atomický commit, výber koordinátora (bully algoritmus).
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Replikácia dát v distribuovaných databázach]
+\begin{itemize}
+ \item Replikácia dát.
+ \item Distribuované zámky, distribuované deadlocky.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Synchronizácia času v distribuovaných systémoch]
+\begin{itemize}
+ \item Synchronizácia fyzických hodín, Christianov algoritmus, Berkeley algoritmus.
+ \item Lamportov čas.
+\end{itemize}
+\end{zadanie}
+
+\chapter{OO analýza}
+
+\kzadanie{Use-case modelovanie}
+\kzadanie{Modelovanie tried}
+\kzadanie{Modelovanie kompozitných štruktúr}
+\kzadanie{Modelovanie interakcií}
+\kzadanie{Modelovanie stavových automatov}
+\kzadanie{Modelovanie aktivít}
+\kzadanie{Modelovanie komponentov}
+\kzadanie{Modelovanie nasadenia systému}
+\kzadanie{Pomocné modelovacie konštrukty}
+\kzadanie{UML profily}
+
+\chapter{Teória paralelných výpočtov}
+
+\begin{zadanie}[Paralelné gramatiky]
+\begin{itemize}
+ \item paralelné prepisovanie
+ \begin{itemize}
+  \item Lindenmayerove systémy
+  \item Indické a Ruské paralelné gramatiky
+  \item generatívne systémy
+ \end{itemize}
+ \item kooperujúce distribuované gramatiky
+ \item paralelné gramatické systémy
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Paralelné stroje]
+\begin{itemize}
+ \item alternujúce Turingove stroje
+ \item alternujúce konečné automaty
+ \item boolovské obvody
+ \item PRAM
+ \item počítače druhej triedy
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Ťažké problémy]
+\begin{itemize}
+ \item Trieda NC
+ \item redukovateľnosť
+ \item P-úplné problémy
+\end{itemize}
+\end{zadanie}
+
+\chapter{Výpočtová zložitosť}
+
+\begin{zadanie}[Turingove stroje, základné zložitostné triedy a vzťahy medzi nimi]
+\begin{itemize}
+ \item Savitchova veta
+ \item simulácie a hierarchie
+\end{itemize}
+\end{zadanie}
+
+\kzadanie{Gap Theorem a Veta o zrýchľovaní}
+\begin{zadanie}[NP-úplnosť, Cook-Levinova veta]
+a niektoré ďalšie (aj pre prax dôležité) NP-úplné problémy
+\end{zadanie}
+\kzadanie{Vzťah NP-úplných a NP-optimalizačných problémov}
+\kzadanie{Aproximačné algoritmy pre NP-optimalizačné problémy; neaproximovateľnosť}
+
+\begin{zadanie}[Pravdepodobnostné algoritmy]
+\begin{itemize}
+ \item Veta o vylepšovaní
+ \item BPP vs. PSPACE
+\end{itemize}
+\end{zadanie}
+
+\chapter{Vypočítateľnosť}
+
+\begin{zadanie}[Churchova-Turingova téza]
+\begin{itemize}
+ \item Zdôvodnenie ekvivalencie Turingovych strojov počítajúcich funkciu a Minského registrových strojov.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Primitívna rekurzia]
+\begin{itemize}
+ \item Definícia tejto triedy funkcií a základné vlastnosti.
+ \item Súvis s programami bez while-cyklov.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Rekurzívne a čiastočne rekurzívne funkcie]
+\begin{itemize}
+ \item Definícia a ekvivalencia s automatovými modelmi vypočítateľnosti.
+ \item Rekurzívne množiny a predikáty.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Aritmetizácia syntaxe]
+\begin{itemize}
+ \item Kódovanie objektov do čísel.
+ item Univerzálne funkcie a ich zložitosť vzhľadom na príslušnú triedu funkcií.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Vyčísliteľné reálne čísla]
+\begin{itemize}
+ \item Definícia a základné vlastnosti.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Nerozhodnuteľné problémy]
+\begin{itemize}
+ \item Funkcia Busy Beaver.
+ \item Problém zastavenia a jeho úplnosť pri many-to-one redukcii.
+\end{itemize}
+\end{zadanie}
+
+\chapter{Vyhľadávanie v texte}
+
+\begin{zadanie}[Vyhľadávanie vzorky v texte]
+\begin{itemize}
+ \item pomocou konečných automatov
+ \item Knuth-Morris-Prattov algoritmus
+\end{itemize}
+\end{zadanie}
+
+\kzadanie{Sufixové stromy a príklady ich použitia}
+\kzadanie{Sufixové polia}
+\kzadanie{Výpočet editačnej vzdialenosti medzi reťazcami}
+\kzadanie{Výpočet najdlhšej spoločnej podpostupnosti dvoch reťazcov}
+\kzadanie{Vyhľadávanie približných výskytov vzorky v texte}
+
+\chapter{Kompilátory}
+
+\begin{zadanie}[Štruktúra kompilátorov]
+\begin{itemize}
+ \item Základné pojmy. Vzťah k teórii jazykov. Syntaktická analýza. Sémantika. Jedno a viac prechodové kompilátory.
+ \item Jednoduchý jednoprechodový kompilátor. Rekurzívny zostup. Syntaktické diagramy.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Lexikálna analýza]
+\begin{itemize}
+ \item Dôvody oddelenia lexikálnej a syntaktickej analýzy. Lexikálna štruktúra jazykov. Regulárne jazyky. Konečné automaty.
+ \item Syntéza: Regulárny jazyk - nedeterministický konečný automat - deterministický konečný automat.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Syntaktická analýza]
+\begin{itemize}
+ \item Bezkontextové gramatiky. Návrh gramatiky jazyka. Syntaktické stromy.
+ \item Metódy zhora - dolu: rekurzívny zostup, LL(1), LL(k).
+ \item Metódy zdola - hore: Operátorovo precedenčné gramatiky a jazyky, LR(k) metódy ( SLR(1), LALR(1)).
+ \item Oprava chýb a zotavenie sa z chýb pri syntaktickej analýze.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Syntaxou riadené preklady]
+\begin{itemize}
+ \item Atribútové gramatiky. Syntetizované a zdedené atribúty.
+ \item Vyhodnocovanie atribútov. Porovnanie metód zhora - dole a zdola - hore.
+ \item Graf závislosti atribútov.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Kontrola typov]
+\begin{itemize}
+ \item Systém typov v programovacích jazykoch a konverzie medzi typmi.
+ \item Gramatika typov a kontrola typov ako syntaxou riadený preklad.
+ \item Polymorfické typy. Unifikácia.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Podpora v čase behu (Run-time environments)]
+\begin{itemize}
+ \item Organizácia a prideľovanie pamäte.
+ \item Odovzdávanie parametrov, lokálne a nelokálne premenné.
+ \item Prideľovanie a organizácia dynamickej pamäte.
+ \item Tabuľka symbolov - hašovanie.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Generovanie medzijazyka]
+\begin{itemize}
+ \item Formy medzijazyka:
+ \begin{itemize}
+  \item Poľská bezzátvorková forma
+  \item trojadresový kód
+  \item trojice, štvorice
+ \end{itemize}
+ \item Generovanie medzijazyka syntaxou riadeným prekladom.
+ \item Popis základných konštrukcii: deklarácie, výrazy, príkaz priradenia, booleovské výrazy, podmienené príkazy a cykly. Volanie procedúr a funkcií.
+ \item Spätné plátanie (backpatching).
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Generovanie kódu]
+\begin{itemize}
+ \item Cieľový počítač: CISC, RISC, SIC. Ceny inštrukcií.
+ \item Administrácia pamäte. Statická pamäť, zásobník, dynamická pamäť - heap.
+ \item Prideľovanie registrov. Prideľovanie registrov farbením grafu.
+ \item Generovanie kódu z dagu.
+ \item Generovanie kódu pokrývaním ozdobeného stromu.
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Optimalizácia kódu]
+\begin{itemize}
+ \item Kukátková (peephole) optimalizácia.
+ \item Optimalizácia základných blokov, optimalizačné transformácie.
+\end{itemize}
+\end{zadanie}
+
+\chapter{Kolmogorovská zložitosť}
+
+\begin{zadanie}[Definícia, význam a základné vlastnosti Kolmogorovskej zložitosti]
+\begin{itemize}
+ \item Varianty Kolmogorovskej zložitosti a vzťahy medzi nimi
+\end{itemize}
+\end{zadanie}
+
+\begin{zadanie}[Nestlačiteľné reťazce]
+\begin{itemize}
+ \item definícia, význam.
+ \item Vysvetlenie metódy nestlačiteľnosti a ukážka jej využitia na konkrétnych príkladoch.
+\end{itemize}
+\end{zadanie}
+
+\end{document}
