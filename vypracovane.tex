@@ -6,6 +6,7 @@
 \usepackage{xcolor}
 \usepackage{environ}
 \usepackage{ifmtarg}
+\usepackage{amssymb,amsmath}
 \usepackage{listings}
 \usepackage{lmodern}
 \usepackage{rotating}
@@ -163,6 +164,219 @@
  \item Synchronizácia času, Christianov algoritmus, Berkeley algoritmus.
 \end{itemize}
 \end{zadanie}
+
+\paragraph*{Úvod}
+
+Transakcia:
+\begin{itemize}
+ \item program pristupuúci k databáze
+ \item môže ich bežať viacero v tom istom čase
+ \item postupnosť operácií R, W, INSERT, DEL, START, COMMIT, ABORT
+\end{itemize}
+
+\begin{description}
+\item[Atomicity]
+celá transakcia zbehne, alebo sa nevykoná vôbec
+
+\item[Consistency]
+vykonanie T z konz. stavu do konz. stavu
+
+\item[Isolation]
+výsledok rovnaký ako keď transakcie sú serializované
+
+\item[Durability]
+ak T úspešne skončí, tak zmeny ostanú navždy zachované
+\end{description}
+
+\begin{minipage}[t]{0.5\textwidth}
+\centerline{Centralizovaná DB}
+\begin{itemize}
+ \item[+] jednoduchá, spoľahlivá
+ \item[+] kompatibilná s $\exists$ byrokraciou
+ \item[-] výpadok centrály
+ \item[-] rýchlosť obsluhovania požiadaviek
+\end{itemize}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\centerline{Distribuovaná DB}
+\begin{itemize}
+ \item[+] odolnosť voči výpadkom
+ \item[+] rýchlosť
+ \item[-] komplikovaná archit., bezpečnosť, integrita
+ \item[-] cena, chýbajúce štandardy a skúsenosti
+ \item[-] databázový dizajn komplikovaný
+\end{itemize}
+\end{minipage}
+
+\hrule
+
+\begin{description}
+\item[horizontálna fragmentácia]
+rovnaké dáta na rôznych miestach: pobočky banky
+
+\item[vertikálna fragmentácia]
+rôzne dáta na rôznych miestach: štátne inštitúcie
+\end{description}
+
+Požiadavky:
+
+\begin{itemize}
+ \item ACID, transparentnosť (jedno na kt. pobočke)
+ \item odolnosť voči výpadkom uzlov a liniek
+\end{itemize}
+
+\paragraph{Atomický commit protocol}
+
+\begin{itemize}
+ \item $\forall$ čo urobia rozhodn. $\rightarrow$ rovnaké (ABORT/COMMIT)
+ \item keď sa proces rozhodne, už svoje rozhodnutie nezmení
+ \item COMMIT len ak $\forall$ hlasujú YES
+ \item ak $\forall$ YES a $\nexists$ výpadky $\Rightarrow$ musí byť COMMIT
+ \item ak po výpadku dlho ďaľšie nie sú \ldots musí byť rozhodnuté
+\end{itemize}
+
+\noindent
+asynchr. model komunikácie, jeden uzol koordinátor (ost. participanti)
+
+\subparagraph*{2-fázový}
+\begin{enumerate}
+ \item hlasovanie (koord. vyzve k hlasovaniu, part. pošlú hlasy)
+ \item koord. čaká na hlasy, globálne rozhodnutie (koord. pošle rozhodnutie)
+ \item[final] koord. čaká na ACK
+\end{enumerate}
+
+\begin{itemize}
+ \item ak spadne PART
+ \begin{itemize}
+  \item ak to koord zistí \ldots ABORT
+ \end{itemize}
+ \item ak spadne KOORD
+ \begin{itemize}
+  \item ak niekto má COMMIT/ABORT tak sa ostatní informujú
+  \item ak $\forall$ YES - problém BLOCK kým sa koord. neobnoví
+ \end{itemize}
+\end{itemize}
+
+\subparagraph*{3-fázový}
+\begin{itemize}
+ \item pridávanie PRECOMMIT fázy
+ \item ak spadne KOORD
+ \begin{itemize}
+  \item ak má niekto PRECOMMIT $\rightarrow$ COMMIT
+  \item ak $\nexists \rightarrow$ ABORT
+  \item nekonzistencia ak graf rozdelený na 2 komp.
+ \end{itemize}
+\end{itemize}
+
+\subparagraph*{Majoritný 3-fázový}
+\begin{itemize}
+ \item posielanie PREABORT
+ \item rozhodnutie ak väčšina uzlov PREABORT / PRECOMMIT
+\end{itemize}
+
+\paragraph{Bully algoritmus na výber koordinátora}
+
+\begin{itemize}
+ \item iniciátor posiela $\uparrow$ id správu Election
+ \item tí, čo nie sú spadnutí pošlú OK
+ \item tí, čo poslali OK robia to, čo iniciátor
+ \item ak niekto nepošle OK spať: oznám $\forall$ menším, že som koord.
+\end{itemize}
+
+\paragraph{Replikácia dát}
+\begin{itemize}
+ \item rovnaké dáta na rôznych miestach (zabezp. izoláciu a sériov.)
+ \item čítanie dát možné z ľubov. uzla, write treba vo všetkých
+\end{itemize}
+
+\hrule
+
+\paragraph{Distribuované zamykanie}
+\subparagraph*{centralizovaná schéma}
+\begin{itemize}
+ \item len jeden uzol je lock manager (+jednoduché, -malá odolnosť, -bottleneck)
+\end{itemize}
+
+\subparagraph*{primary copy schéma}
+\begin{itemize}
+ \item každý uzol je lock manager zodpovedný za podmnožinu dát
+ \item read-lock možno žiadať od hociktorého LM
+ \item write-lock možno žiadať len od primárneho LM (len 1 kóp. je primárna), ten konzultuje s ostatnými, čo majú danú kópiu
+\end{itemize}
+
+\noindent
+(+ menší bottleneck, -možnosť distr. deadlocku)
+
+\subparagraph*{2-fáz. Read-One-Write-All (ROWA) protokol}
+\begin{itemize}
+ \item RL hocikto, kto má dáta
+ \item WL treba žiadať všetkých, čo majú dané dáta
+\end{itemize}
+
+\subparagraph*{Majoritný 2-fáz. protokol}
+\begin{itemize}
+ \item na RL aj WL treba žiadať väčšinu lock managerov
+ \item deadlock môže nastať aj pri zamykaní 1 záz. (3. trans. vlastna každá 1/3 zámkov. workaround: poradie zamykania lockov)
+\end{itemize}
+
+\subparagraph*{Quorum protokol}
+\begin{itemize}
+ \item Každý uzol váha $w_i$, $w_i > 0$
+ \item $Q_r,Q_w > 0:\:Q_r + Q_w > \Sigma w_i \wedge 2 Q_w > \Sigma w_i$
+ \item Každý read (resp. write) musí získať zámok na toľkých kópiách, aby suma uzlov, ktoré tie kópie spravujú bola aspoň $Q_r$ (resp. $Q_w$)
+\end{itemize}
+
+\paragraph{Správa deadlockov}
+\begin{itemize}
+ \item uzly majú lokálny wait-for graf (WFG)
+ \item koordinátor robí globálny WFG, ak nájde cyklus $\rightarrow$ ABORT
+ \item problém: detekcia $\nexists$ cyklov (glob. WFG je len aproximácia, kvôli oneskoreniam/poradiu správ o lok. WFG, preto koord. niekedy abortne aj transakcie, ktoré nemusí)
+\end{itemize}
+
+\hrule
+
+\paragraph{Synchronizácia času}
+\begin{itemize}
+ \item $\forall$ uzol má lokálne hodiny
+ \item $\forall$ hodiny len dopredu
+ \item rôzne hodiny môžu mať rôzne fyzické časy
+ \item rôzne hodiny môžu tikať rôzne rýchlo
+\end{itemize}
+
+\subparagraph{Christianov algoritmus}
+\begin{itemize}
+ \item klienti si synchr. čas podľa jedného servera
+ \item ak I nepoznáme: kom. čas = $(T_1 - T_0) / 2$
+ \item ak I poznáme: kom. čas = $(T_1 - T_0 - I) / 2$
+ \item nastav hodiny na $C_UTC$ + kom. čas (ak je to menej, spomaľ hodiny, aby za zaručilo,
+ že idú vždy dopredu)
+\end{itemize}
+
+\includegraphics[width=0.5\textwidth]{obrazky/christianov-protokol}
+
+\subparagraph{Berkeley protokol}
+\begin{itemize}
+ \item server synchronizuje čas všetkých na priemer
+\end{itemize}
+\begin{enumerate}
+ \item server pošle svoj čas
+ \item $\forall$ odpovedia rozdielom
+ \item server zpriemeruje a pošle každému o koľko si má posunúť hodiny
+\end{enumerate}
+
+\subparagraph{Logické hodiny}
+\begin{itemize}
+ \item čas. pečiatky pre udalosti
+ \item Ak $A_i$ po $A_j$ potom $C(A_i) > C(A_j)$
+ \item Ak $A_i$ prijatie správy v procese P a $A_j$ odoslanie správy z P, potom $C(Ai) < C(Aj)$
+ \item $\forall i,j: C(A_i) \neq C(A_j)$
+\end{itemize}
+
+\subparagraph{Lamportov čas}
+\begin{itemize}
+ \item buď si každý posunie hodiny dopredu, ak obdrží správu s vyššou pečiatkou ako je jeho aktúálny čas
+ \item alebo (alternatívna implementácia), časová pečiatka je n-tica obsahujúca najväčšie známe časy v jednotlivých uzloch, sled udalostí = lexikografické usporiadanie, synchr. fyz. hodín nie je nutná (iba to, že idú dopredu)
+\end{itemize}
 
 \chapter{Distribuované systémy}
 
